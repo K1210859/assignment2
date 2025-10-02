@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Photo Portal</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script defer src="/static/js/photo-portal.js"></script>
+  <style>
+    .div_left, .div_right { background-color: lightblue; }
+    .div_left { height: 90vh; }
+    figure { margin: 6px 0; }
+    figcaption { font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+
+<!-- Modal for previews -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Image preview</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="image-modal-body"></div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid" style="background-color:transparent">
+  <div class="row">
+    <div class="col">
+      <div class="text-left"><a href="https://www.cs.utexas.edu/~devdatta" target="_blank">MWA</a></div>
+    </div>
+    <div><h5 style="margin-top:5px;">Photo Portal</h5></div>
+    <div class="col text-right">
+      <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="true">
+          {{ user }}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu text-center" aria-labelledby="dropdownMenu1">
+          <li><a href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
+
+<div class="container-fluid">
+  <div class="row mvh-100 flex-column flex-md-row">
+    <!-- Left column -->
+    <div class="col-md-2 div_left">
+      <div class="row" id="uploadPhoto">
+        {% if is_admin %}
+          <button onclick="document.getElementById('uploadPhotoFormDiv').style.display='block'"
+                  style="margin-left:5px;margin-top:5px">Upload Photo</button>
+        {% else %}
+          <!-- No upload button for general users (1.3.2) -->
+        {% endif %}
+      </div>
+      <hr>
+
+      <!-- Search (5.1) -->
+      <form id="searchForm" action="/search" method="post">
+        <label>Search</label>
+        <select name="searchBy" id="searchBy" class="form-control form-control-sm">
+          <option value="name">By Name</option>
+          <option value="date">By Date</option>
+          <option value="tags">By Tags</option>
+        </select>
+        <input id="searchText"  name="searchText"  class="form-control form-control-sm" placeholder="photo name">
+        <input id="searchDate"  name="searchDate"  class="form-control form-control-sm" placeholder="MM/DD/YYYY">
+        <input id="searchTags"  name="searchTags"  class="form-control form-control-sm" placeholder="comma-separated tags">
+        <button class="btn btn-secondary btn-sm mt-2" type="submit">Search</button>
+      </form>
+
+      <hr>
+
+      <!-- Photo anchor list built by Jinja -->
+      <div class="row">
+        <div>
+          <ol id="photo_list">
+            {% for p in photos %}
+              <li>
+                <a href="#" data-toggle="modal" data-target="#imageModal" onclick="openPreview('{{ p.url }}')">
+                  {{ p.name }}
+                </a>
+              </li>
+            {% endfor %}
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle -->
+    <div class="col-md-8 flex-grow-1" id="entity-form-container">
+      <div id="status">
+        <div id="status_string">{{ status_msg }}</div>
+      </div>
+
+      {% if is_admin %}
+      <div id="uploadPhotoFormDiv" style="display:none;">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+          <label>Photo Name</label>
+          <input class="form-control" type="file" name="photo_name" id="photo_name" required>
+          <br>
+          <b style="color:blue;">Photo metadata</b>
+          <table>
+            <tr>
+              <td><label>Date taken</label></td>
+              <td><input type="text" name="date_taken" placeholder="MM/DD/YYYY" id="date_taken"></td>
+            </tr>
+            <tr>
+              <td><label for="tags">Tags</label></td>
+              <td><input type="text" id="tags" name="tags" placeholder="comma-separated (optional)"></td>
+            </tr>
+          </table>
+          <button class="btn btn-primary mt-2" type="submit">Submit</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Right column: Thumbnails (Jinja + figure/figcaption) (4.1, 4.2, 4.3) -->
+    <div class="col-md-2 div_right" id="entity-form-container-2">
+      <div class="row">
+        <div>
+          <h6>Thumbnails:</h6>
+          <ol id="available_photos_list">
+            {% for p in photos %}
+              <li>
+                <figure>
+                  <img src="{{ p.url }}" alt="{{ p.name }}" height="60" width="60"
+                       data-toggle="modal" data-target="#imageModal"
+                       onclick="openPreview('{{ p.url }}')">
+                  <figcaption>{{ p.name }}</figcaption>
+                </figure>
+              </li>
+            {% endfor %}
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</body>
+</html>
