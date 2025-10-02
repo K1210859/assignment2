@@ -1,0 +1,6 @@
+Portal started...
+ * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+ * Running on http://172.29.200.194:5009/ (Press CTRL+C to quit)
+127.0.0.1 - - [27/Sep/2025 22:22:17] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [27/Sep/2025 22:22:22] "GET /admin HTTP/1.1" 200 -
